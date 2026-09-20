@@ -34,3 +34,87 @@
 | Docker Compose | Запуск приложения с постоянным хранилищем базы |
 
 Версии Python-пакетов зафиксированы в `requirements.txt` и `requirements-dev.txt`.
+
+## Быстрый запуск с Docker
+
+Нужны Docker Engine и Docker Compose. Выполняйте команды из корня проекта:
+
+```bash
+docker compose up --build -d
+docker compose exec web python polka.py --db /app/data/polka.db seed
+```
+
+Откройте [http://localhost:8000](http://localhost:8000).
+`seed` добавляет четыре учебные книги только в пустую базу.
+Если записи уже есть, команда завершится отказом и не изменит их.
+Без `seed` приложение откроется с пустой полкой.
+
+База хранится в именованном Docker volume `polka-data`.
+Остановить приложение, сохранив данные:
+
+```bash
+docker compose down
+```
+
+Не добавляйте `-v`, если хотите сохранить книги: этот флаг удаляет volume.
+
+## Локальный запуск без Docker
+
+Нужен Python 3.14 с модулем `sqlite3`. Следующие команды — для macOS/Linux.
+Запускайте их из корня проекта. Выберите этот способ или Docker: оба используют порт 8000.
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements-dev.txt
+python -c "from pathlib import Path; Path('data').mkdir(exist_ok=True)"
+python polka.py --db data/polka.db seed
+python web.py
+```
+
+Откройте [http://localhost:8000](http://localhost:8000).
+Последняя команда работает до остановки через `Ctrl+C`.
+При повторном запуске достаточно активировать окружение и выполнить `python web.py`;
+повторять `seed` не нужно.
+
+### Один проверочный сценарий
+
+1. Откройте «Город за рекой» и выдайте книгу читателю «Елена».
+2. Проверьте, что рядом с названием появилась Елена, а справа — действие возврата.
+3. Обновите страницу: выдача должна сохраниться.
+4. Нажмите «Отметить возврат» и подтвердите действие.
+5. Убедитесь, что книга снова на полке; в истории есть выдача и возврат.
+
+Отказ в повторной выдаче и сохранность исходного читателя проверяются автоматически.
+[Другие сценарии и команда изолированного демо](docs/demo.md).
+
+## Тесты и линтеры
+
+В активированном окружении с `requirements-dev.txt`:
+
+```bash
+python scripts/check.py
+```
+
+Команда выполняет Ruff, проверку форматирования Python, djLint, проверку форматирования
+шаблонов и 20 тестов. При первой неудачной проверке возвращает ненулевой код завершения.
+Все базы тестов временные; личный файл данных не используется.
+
+Отдельные проверки:
+
+```bash
+python -m unittest discover -s tests -v
+python -m ruff check .
+python -m ruff format --check .
+python -m djlint templates --lint
+python -m djlint templates --check
+```
+
+Проверить в Linux-контейнере без локальной установки Python:
+
+```bash
+docker build --target checks -t polka-checks .
+```
+
+Финальный образ приложения не включает линтеры и тестовые зависимости.
+[Подробности разработки и конфигурации](docs/development.md).
