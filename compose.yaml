@@ -1,0 +1,13 @@
+services:
+  web:
+    build:
+      context: .
+      target: runtime
+    ports:
+      - "127.0.0.1:${POLKA_WEB_PORT:-8000}:8000"
+    volumes:
+      - polka-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  polka-data:

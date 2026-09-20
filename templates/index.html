@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="titlebar">
+        <div>
+            <h1>Моя книжная полка</h1>
+            <p class="caption">Что у вас, что у друзей — всё в одном месте.</p>
+        </div>
+        <a class="primary" href="{{ url_for('index', view='add') }}">+ Добавить книгу</a>
+    </div>
+    {% for message in get_flashed_messages() %}
+        <div class="notice" role="status">{{ message }}</div>
+    {% endfor %}
+    {% if error %}<div class="notice error" role="alert">{{ error }}</div>{% endif %}
+    <div class="layout">
+        <section class="booklist" aria-label="Книги">
+            <div class="listlabel">КНИГИ И ЧИТАТЕЛИ</div>
+            {% for item in books %}
+                <a class="book {% if selected and selected.id == item.id and view != 'add' %}selected{% endif %}"
+                   href="{{ url_for('index', book=item.id) }}"
+                   {% if selected and selected.id == item.id and view != 'add' %}aria-current="true"{% endif %}>
+                    <span class="spine" aria-hidden="true">{{ item.id }}</span>
+                    <span class="booktext">
+                        <span class="name">{{ item.title }}</span>
+                        <span class="status">
+                            <span class="dot {% if item.borrower %}away{% endif %}"
+                                  aria-hidden="true"></span>
+                            {% if item.borrower %}У читателя · {{ item.borrower }}{% else %}На полке{% endif %}
+                        </span>
+                    </span>
+                    <span class="arrow" aria-hidden="true">›</span>
+                </a>
+            {% else %}
+                <div class="empty">
+                    <h2>На полке пока нет книг</h2>
+                    <p class="caption">Добавьте первую книгу, чтобы записывать выдачи и возвраты.</p>
+                </div>
+            {% endfor %}
+        </section>
+        <section class="detail" aria-label="Выбранная книга">
+            {% if view == "add" or not selected %}
+                <p class="label">НОВЫЙ ЭКЗЕМПЛЯР</p>
+                <h2>Добавить книгу</h2>
+                <form method="post" action="{{ url_for('add_book') }}">
+                    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                    <label for="title">Название книги</label>
+                    <input id="title"
+                           name="title"
+                           placeholder="Например, Город за рекой"
+                           required
+                           maxlength="200"
+                           value="{{ request.form.get('title', '') }}">
+                    <p class="caption">Одинаковые названия допустимы: каждый экземпляр получит свой номер.</p>
+                    <div class="actions">
+                        <button class="primary" type="submit">Добавить</button>
+                        {% if selected %}<a class="secondary"
+   href="{{ url_for('index', book=selected.id) }}">Отмена</a>{% endif %}
+                    </div>
+                </form>
+            {% else %}
+                <p class="label">ЭКЗЕМПЛЯР № {{ selected.id }}</p>
+                <h2>{{ selected.title }}</h2>
+                {% if selected.borrower %}
+                    <div class="borrower">
+                        <span class="caption">Сейчас у читателя</span>
+                        <strong>{{ selected.borrower }}</strong>
+                    </div>
+                    {% if view == "return" %}
+                        <p>Книга уже вернулась на полку?</p>
+                        <form method="post"
+                              action="{{ url_for('return_book', book_id=selected.id) }}"
+                              class="actions">
+                            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                            <input type="hidden" name="loan_id" value="{{ events[0].id }}">
+                            <button class="primary" type="submit">Да, отметить возврат</button>
+                            <a class="secondary"
+                               href="{{ url_for('index', book=selected.id) }}">Отмена</a>
+                        </form>
+                    {% else %}
+                        <a class="primary"
+                           href="{{ url_for('index', book=selected.id, view='return') }}">Отметить возврат</a>
+                        <p class="rule">Выдать другому читателю можно после возврата.</p>
+                    {% endif %}
+                {% else %}
+                    <div class="borrower">
+                        <span class="caption">Сейчас</span>
+                        <strong>На полке</strong>
+                    </div>
+                    <form method="post"
+                          action="{{ url_for('lend_book', book_id=selected.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                        <label for="borrower">Кому выдаёте книгу?</label>
+                        <input id="borrower"
+                               name="borrower"
+                               placeholder="Имя читателя"
+                               required
+                               maxlength="100"
+                               value="{{ request.form.get('borrower', '') }}">
+                        <button class="primary" type="submit">Выдать книгу</button>
+                    </form>
+                {% endif %}
+                <div class="history">
+                    <h3>История книги</h3>
+                    {% for event in events %}
+                        <div class="event">
+                            <span class="eventmark"
+                                  aria-hidden="true">{% if event.action == "lend" %}↗{% else %}↙{% endif %}</span>
+                            <div>
+                                {% if event.action == "lend" %}Выдана{% else %}Возвращена{% endif %}
+                                <span class="caption">{{ event.borrower }}</span>
+                            </div>
+                        </div>
+                    {% else %}
+                        <p class="caption">Выдач пока не было.</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </section>
+    </div>
+    <footer class="footer">
+        Учебный проект · Каждый экземпляр книги учитывается отдельно
+    </footer>
+{% endblock %}

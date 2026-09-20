@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+    <section class="detail">
+        <h1>Не удалось выполнить действие</h1>
+        <p class="error-message" role="alert">{{ message }}</p>
+        <a class="primary" href="{{ url_for('index') }}">Вернуться к книгам</a>
+    </section>
+{% endblock %}
