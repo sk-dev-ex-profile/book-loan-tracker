@@ -1,8 +1,8 @@
-# Устройство «Полки»
+# Устройство Book Loan Tracker
 
 ```text
 Браузер → web.py → library.py → SQLite
-Терминал → polka.py ↗
+Терминал → book_tracker.py ↗
 ```
 
 [web.py](../web.py) принимает HTTP-запросы и отправляет HTML из
@@ -10,7 +10,7 @@
 [static/app.css](../static/app.css); JavaScript не используется.
 Waitress запускает веб-приложение одним процессом с четырьмя потоками.
 
-[polka.py](../polka.py) разбирает аргументы CLI. Оба интерфейса вызывают
+[book_tracker.py](../book_tracker.py) разбирает аргументы CLI. Оба интерфейса вызывают
 [library.py](../library.py): `add()`, `lend()`, `give_back()`, `history()`.
 Условия выдачи и возврата не дублируются в HTML или HTTP-обработчиках.
 

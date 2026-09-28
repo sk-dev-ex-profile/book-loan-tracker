@@ -41,7 +41,7 @@
 
 ```bash
 docker compose up --build -d
-docker compose exec web python polka.py --db /app/data/polka.db seed
+docker compose exec web python book_tracker.py --db /app/data/book-tracker.db seed
 ```
 
 Откройте [http://localhost:8000](http://localhost:8000).
@@ -49,7 +49,7 @@ docker compose exec web python polka.py --db /app/data/polka.db seed
 Если записи уже есть, команда завершится отказом и не изменит их.
 Без `seed` приложение откроется с пустой полкой.
 
-База хранится в именованном Docker volume `polka-data`.
+База хранится в именованном Docker volume `book-loan-tracker-data`.
 Остановить приложение, сохранив данные:
 
 ```bash
@@ -68,7 +68,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements-dev.txt
 python -c "from pathlib import Path; Path('data').mkdir(exist_ok=True)"
-python polka.py --db data/polka.db seed
+python book_tracker.py --db data/book-tracker.db seed
 python web.py
 ```
 
@@ -113,7 +113,7 @@ python -m djlint templates --check
 Проверить в Linux-контейнере без локальной установки Python:
 
 ```bash
-docker build --target checks -t polka-checks .
+docker build --target checks -t book-loan-tracker-checks .
 ```
 
 Финальный образ приложения не включает линтеры и тестовые зависимости.
