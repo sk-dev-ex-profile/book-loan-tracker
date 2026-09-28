@@ -14,7 +14,7 @@ class WebTest(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
-        self.db = Path(self.temp.name) / "polka.db"
+        self.db = Path(self.temp.name) / "book-tracker.db"
         self.app = create_app(
             {"TESTING": True, "DATABASE": str(self.db), "SECRET_KEY": "test-only"}
         )
@@ -115,14 +115,21 @@ class WebTest(unittest.TestCase):
     def test_cli_and_web_share_changes(self):
         root = Path(__file__).resolve().parents[1]
         subprocess.run(
-            [sys.executable, str(root / "polka.py"), "--db", str(self.db), "add", "Книга из CLI"],
+            [
+                sys.executable,
+                str(root / "book_tracker.py"),
+                "--db",
+                str(self.db),
+                "add",
+                "Книга из CLI",
+            ],
             check=True,
             capture_output=True,
         )
         self.assertIn("Книга из CLI", self.client.get("/").text)
         self.post("/books/1/lend", borrower="Анна")
         result = subprocess.run(
-            [sys.executable, str(root / "polka.py"), "--db", str(self.db), "list"],
+            [sys.executable, str(root / "book_tracker.py"), "--db", str(self.db), "list"],
             check=True,
             capture_output=True,
             text=True,
