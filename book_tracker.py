@@ -1,4 +1,4 @@
-"""CLI учебного приложения «Полка»."""
+"""CLI учебного приложения Book Loan Tracker."""
 
 import argparse
 import json
@@ -27,8 +27,10 @@ def demo():
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Полка: учёт выданных книг")
-    parser.add_argument("--db", default="polka.db", help="файл SQLite; по умолчанию polka.db")
+    parser = argparse.ArgumentParser(description="Book Loan Tracker: учёт выданных книг")
+    parser.add_argument(
+        "--db", default="book-tracker.db", help="файл SQLite; по умолчанию book-tracker.db"
+    )
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("demo", help="учебный сценарий в отдельной базе в памяти")
     commands.add_parser("list", help="список книг и текущих читателей")
