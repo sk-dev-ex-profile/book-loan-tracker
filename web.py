@@ -1,4 +1,4 @@
-"""Веб-интерфейс «Полки»: HTML-страницы и формы, общая логика в library.py."""
+"""Веб-интерфейс Book Loan Tracker: HTML-страницы и формы, общая логика в library.py."""
 
 import os
 import secrets
@@ -13,8 +13,8 @@ import library
 def create_app(config=None):
     app = Flask(__name__)
     app.config.from_mapping(
-        DATABASE=os.environ.get("POLKA_DB", "data/polka.db"),
-        SECRET_KEY=os.environ.get("POLKA_SECRET_KEY") or secrets.token_hex(32),
+        DATABASE=os.environ.get("BOOK_TRACKER_DB", "data/book-tracker.db"),
+        SECRET_KEY=os.environ.get("BOOK_TRACKER_SECRET_KEY") or secrets.token_hex(32),
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="Lax",
         MAX_CONTENT_LENGTH=16_384,
@@ -144,7 +144,7 @@ if __name__ == "__main__":
 
     serve(
         create_app(),
-        host=os.environ.get("POLKA_HOST", "127.0.0.1"),
-        port=int(os.environ.get("POLKA_PORT", "8000")),
+        host=os.environ.get("BOOK_TRACKER_HOST", "127.0.0.1"),
+        port=int(os.environ.get("BOOK_TRACKER_PORT", "8000")),
         threads=4,
     )
