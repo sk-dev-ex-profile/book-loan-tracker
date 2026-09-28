@@ -13,8 +13,8 @@
 
 ```bash
 python -c "from pathlib import Path; Path('data').mkdir(exist_ok=True)"
-python polka.py --db data/demo.db seed
-POLKA_DB=data/demo.db python web.py
+python book_tracker.py --db data/demo.db seed
+BOOK_TRACKER_DB=data/demo.db python web.py
 ```
 
 Если `data/demo.db` уже содержит записи, выберите другое имя. `seed` не очищает базу.
@@ -49,14 +49,14 @@ POLKA_DB=data/demo.db python web.py
 
 При ширине 390 пикселей список и сведения о книге располагаются друг под другом.
 
-![Полка на узком экране](screenshots/shelf-mobile.png)
+![Book Loan Tracker на узком экране](screenshots/shelf-mobile.png)
 
 ## Изолированное демо CLI
 
 Команда не меняет выбранный файл данных и каждый раз использует отдельную базу в памяти:
 
 ```bash
-python polka.py demo
+python book_tracker.py demo
 ```
 
 Ожидаемый вывод:
@@ -77,19 +77,19 @@ python polka.py demo
 Номер 1 в командах подходит для первой книги новой базы.
 
 ```bash
-python polka.py --db practice.db add "Учебная книга"
-python polka.py --db practice.db lend 1 "Читатель А"
-python polka.py --db practice.db list
-python polka.py --db practice.db lend 1 "Читатель Б"
+python book_tracker.py --db practice.db add "Учебная книга"
+python book_tracker.py --db practice.db lend 1 "Читатель А"
+python book_tracker.py --db practice.db list
+python book_tracker.py --db practice.db lend 1 "Читатель Б"
 ```
 
 Последняя команда должна завершиться с кодом 1 и сообщением «Книга уже выдана».
 Выполните оставшиеся команды отдельно:
 
 ```bash
-python polka.py --db practice.db list
-python polka.py --db practice.db return 1
-python polka.py --db practice.db history 1
+python book_tracker.py --db practice.db list
+python book_tracker.py --db practice.db return 1
+python book_tracker.py --db practice.db history 1
 ```
 
 После отказа книга по-прежнему у Читателя А. После возврата история содержит два события:
