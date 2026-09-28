@@ -14,7 +14,7 @@
 
 ```bash
 docker compose up --build -d
-docker compose exec web python polka.py --db /app/data/polka.db seed
+docker compose exec web python book_tracker.py --db /app/data/book-tracker.db seed
 ```
 
 Откройте http://localhost:8000. Команда `seed` предназначена только для пустой базы.
@@ -50,7 +50,7 @@ docker compose exec web python polka.py --db /app/data/polka.db seed
 
 ```bash
 docker compose up --build -d
-docker compose exec web python polka.py --db /app/data/polka.db seed
+docker compose exec web python book_tracker.py --db /app/data/book-tracker.db seed
 ```
 
 Откройте [http://localhost:8000](http://localhost:8000).
@@ -58,7 +58,7 @@ docker compose exec web python polka.py --db /app/data/polka.db seed
 Если записи уже есть, команда завершится отказом и не изменит их.
 Без `seed` приложение откроется с пустой полкой.
 
-База хранится в именованном Docker volume `polka-data`.
+База хранится в именованном Docker volume `book-loan-tracker-data`.
 Остановить приложение, сохранив данные:
 
 ```bash
@@ -77,7 +77,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements-dev.txt
 python -c "from pathlib import Path; Path('data').mkdir(exist_ok=True)"
-python polka.py --db data/polka.db seed
+python book_tracker.py --db data/book-tracker.db seed
 python web.py
 ```
 
@@ -122,7 +122,7 @@ python -m djlint templates --check
 Проверить в Linux-контейнере без локальной установки Python:
 
 ```bash
-docker build --target checks -t polka-checks .
+docker build --target checks -t book-loan-tracker-checks .
 ```
 
 Финальный образ приложения не включает линтеры и тестовые зависимости.
@@ -138,13 +138,13 @@ docker build --target checks -t polka-checks .
 | Какие команды терминала доступны? | [Справочник CLI](docs/cli.md) |
 | Какие HTTP-запросы принимает приложение? | [Маршруты и ответы](docs/http.md) |
 | Где реализованы правила выдачи и возврата? | [library.py](library.py): `lend()`, `give_back()` |
-| Где находятся точки входа? | [web.py](web.py): `create_app()`; [polka.py](polka.py): `main()` |
+| Где находятся точки входа? | [web.py](web.py): `create_app()`; [book_tracker.py](book_tracker.py): `main()` |
 | Где HTML и оформление? | [Шаблон страницы](templates/index.html), [CSS](static/app.css) |
 | Где проверки? | [Тесты веб-интерфейса](tests/test_web.py), [тесты CLI](tests/test_cli.py) |
 | Где создаются таблицы? | [Начальная SQL-схема](migrations/001_initial.sql) |
 | Почему так организовано хранение? | [Описание решения](docs/decisions/001-storage.md) |
 
-Для команд CLI источник точных имён — `python polka.py --help`, для HTTP-маршрутов —
+Для команд CLI источник точных имён — `python book_tracker.py --help`, для HTTP-маршрутов —
 `web.py`, для переменных окружения — `create_app()` и блок запуска в `web.py`.
 Схема базы находится в `migrations/001_initial.sql`, список зависимостей — в requirements-файлах.
 При расхождении документации с поведением воспроизведите его и исправьте код или описание.

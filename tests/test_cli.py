@@ -18,7 +18,7 @@ class CliTest(unittest.TestCase):
 
     def run_cli(self, *args, ok=True):
         result = subprocess.run(
-            [sys.executable, str(ROOT / "polka.py"), "--db", str(self.db), *args],
+            [sys.executable, str(ROOT / "book_tracker.py"), "--db", str(self.db), *args],
             capture_output=True,
             text=True,
             encoding="utf-8",

@@ -15,7 +15,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements-dev.txt
 python -c "from pathlib import Path; Path('data').mkdir(exist_ok=True)"
-python polka.py --db data/polka.db seed
+python book_tracker.py --db data/book-tracker.db seed
 python web.py
 ```
 
@@ -35,7 +35,7 @@ python web.py
 py -3.14 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
 .\.venv\Scripts\python.exe -c "from pathlib import Path; Path('data').mkdir(exist_ok=True)"
-.\.venv\Scripts\python.exe polka.py --db data/polka.db seed
+.\.venv\Scripts\python.exe book_tracker.py --db data/book-tracker.db seed
 .\.venv\Scripts\python.exe web.py
 ```
 
@@ -43,11 +43,11 @@ py -3.14 -m venv .venv
 
 | Настройка | Значение по умолчанию | Назначение |
 | --- | --- | --- |
-| `POLKA_DB` | `data/polka.db` | Файл базы веб-приложения; путь относительно текущего каталога |
-| `POLKA_HOST` | `127.0.0.1` | Адрес прослушивания локального сервера |
-| `POLKA_PORT` | `8000` | Порт сервера при запуске `python web.py` |
-| `POLKA_SECRET_KEY` | Случайное значение при запуске | Подпись сессионной cookie; необязательна для локального примера |
-| `POLKA_WEB_PORT` | `8000` | Только Compose: порт на компьютере, перенаправленный в контейнер |
+| `BOOK_TRACKER_DB` | `data/book-tracker.db` | Файл базы веб-приложения; путь относительно текущего каталога |
+| `BOOK_TRACKER_HOST` | `127.0.0.1` | Адрес прослушивания локального сервера |
+| `BOOK_TRACKER_PORT` | `8000` | Порт сервера при запуске `python web.py` |
+| `BOOK_TRACKER_SECRET_KEY` | Случайное значение при запуске | Подпись сессионной cookie; необязательна для локального примера |
+| `BOOK_TRACKER_WEB_PORT` | `8000` | Только Compose: порт на компьютере, перенаправленный в контейнер |
 
 Файл `.env` приложение автоматически не читает. Переменные передаются через окружение.
 При новом случайном ключе после перезапуска старая форма становится недействительной:
@@ -56,16 +56,16 @@ py -3.14 -m venv .venv
 Пример другого порта и отдельной базы в macOS/Linux:
 
 ```bash
-POLKA_DB=data/another.db POLKA_PORT=8001 python web.py
+BOOK_TRACKER_DB=data/another.db BOOK_TRACKER_PORT=8001 python web.py
 ```
 
-**CLI не читает `POLKA_DB`.** Для общей с веб-приложением базы явно указывайте путь:
+**CLI не читает `BOOK_TRACKER_DB`.** Для общей с веб-приложением базы явно указывайте путь:
 
 ```bash
-python polka.py --db data/polka.db list
+python book_tracker.py --db data/book-tracker.db list
 ```
 
-Без `--db` CLI использует `polka.db` в текущем каталоге. Веб-приложение создаёт каталог базы
+Без `--db` CLI использует `book-tracker.db` в текущем каталоге. Веб-приложение создаёт каталог базы
 самостоятельно; перед `seed` из CLI каталог нужно создать явно.
 
 ## Автоматические проверки
@@ -104,35 +104,35 @@ Ruff проверяет Python, djLint — Jinja-шаблоны. Это не л�
 
 ```bash
 docker compose up --build -d
-docker compose exec web python polka.py --db /app/data/polka.db seed
+docker compose exec web python book_tracker.py --db /app/data/book-tracker.db seed
 docker compose ps
 docker compose logs web
 ```
 
 Откройте http://localhost:8000. Проверка доступности: GET `/health` возвращает
-`{"status":"ok"}`. В контейнере работает Waitress, от пользователя `polka`, без прав root.
+`{"status":"ok"}`. В контейнере работает Waitress, от пользователя `book-loan-tracker`, без прав root.
 Waitress запускает Flask-приложение; это поддерживаемый [вариант запуска Flask](https://flask.palletsprojects.com/en/stable/deploying/waitress/).
 
-База находится в `/app/data/polka.db`, каталог подключён как именованный volume.
+База находится в `/app/data/book-tracker.db`, каталог подключён как именованный volume.
 Обычное пересоздание контейнера и `docker compose down` сохраняют базу.
 `docker compose down -v` удаляет volume вместе с книгами — это сброс данных, не обычная остановка.
 
 Другой внешний порт:
 
 ```bash
-POLKA_WEB_PORT=8001 docker compose up --build -d
+BOOK_TRACKER_WEB_PORT=8001 docker compose up --build -d
 ```
 
 Проверки в отдельном этапе сборки:
 
 ```bash
-docker build --target checks -t polka-checks .
+docker build --target checks -t book-loan-tracker-checks .
 ```
 
 Сборка приложения:
 
 ```bash
-docker build --target runtime -t polka .
+docker build --target runtime -t book-loan-tracker .
 ```
 
 `runtime` не запускает проверки автоматически: для них предназначен отдельный этап `checks`.
@@ -145,4 +145,4 @@ docker build --target runtime -t polka .
 - `База не пустая`: это ожидаемый отказ повторного `seed`; запускайте приложение с существующими данными.
 - `Форма устарела`: обновите страницу после перезапуска сервера.
 - `unable to open database file`: проверьте каталог и права записи; для CLI создайте каталог заранее.
-- Изменения из CLI не видны в браузере: сравните `--db` и `POLKA_DB`, затем обновите страницу.
+- Изменения из CLI не видны в браузере: сравните `--db` и `BOOK_TRACKER_DB`, затем обновите страницу.
