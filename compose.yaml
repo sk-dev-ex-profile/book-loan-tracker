@@ -4,10 +4,10 @@ services:
       context: .
       target: runtime
     ports:
-      - "127.0.0.1:${POLKA_WEB_PORT:-8000}:8000"
+      - "127.0.0.1:${BOOK_TRACKER_WEB_PORT:-8000}:8000"
     volumes:
-      - polka-data:/app/data
+      - book-loan-tracker-data:/app/data
     restart: unless-stopped
 
 volumes:
-  polka-data:
+  book-loan-tracker-data:
