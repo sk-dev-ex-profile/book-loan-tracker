@@ -17,11 +17,11 @@
 
 ## Начало работы
 
-Git bundle — один файл с историей и ветками Git. Для него не нужен GitHub. Если вы получили `polka.bundle`, откройте терминал в каталоге с ним:
+Git bundle — один файл с историей и ветками Git. Для него не нужен GitHub. Если вы получили `book-loan-tracker.bundle`, откройте терминал в каталоге с ним:
 
 ```bash
-git clone -b main polka.bundle polka-workshop
-cd polka-workshop
+git clone -b main book-loan-tracker.bundle book-loan-tracker-workshop
+cd book-loan-tracker-workshop
 git switch -c my-readme origin/readme-00-assignment
 ```
 
